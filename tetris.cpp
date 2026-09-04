@@ -1,5 +1,12 @@
 #include <GL/glut.h>
-#include "board.h"
+#include "game.h"
+#include <iostream>
+using namespace std;
+void resetGame() {
+    glutPostRedisplay();
+    pieceRow = 0;  // Spawn back at top row
+    pieceCol = 3;  // Center column
+}
 
 // Sets up OpenGL state and coordinate system
 void init() {
@@ -13,11 +20,23 @@ void init() {
 
     initBoard();
 }
+void game(){
+    drawLShape();
+    if(pieceRow == 18){
+        board[pieceRow][pieceCol] = 1;
+        board[pieceRow][pieceCol+1] = 1;
+        board[pieceRow][pieceCol+2] = 1;
+        board[pieceRow+1][pieceCol] = 1;
 
+        resetGame();
+    }
+}
 // GLUT display callback
 void display() {
     glClear(GL_COLOR_BUFFER_BIT);
     drawBoard();
+    game();
+
     glutSwapBuffers();
 }
 
@@ -27,7 +46,7 @@ int main(int argc, char** argv) {
     glutInitWindowSize(WINDOW_WIDTH, WINDOW_HEIGHT);
     glutInitWindowPosition(100, 100);
     glutCreateWindow("Tetris - Board");
-
+    glutSpecialFunc(specialKeys);
     init();
 
     glutDisplayFunc(display);

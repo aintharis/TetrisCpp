@@ -12,6 +12,10 @@ const int BLOCK_SIZE   = 50;   // size of one block in pixels
 const int WINDOW_WIDTH  = BOARD_WIDTH  * BLOCK_SIZE;
 const int WINDOW_HEIGHT = BOARD_HEIGHT * BLOCK_SIZE;
 
+// Active piece position
+int pieceRow = 0;
+int pieceCol = 3;
+
 // Board matrix: 0 = empty cell, non-zero = filled cell (can later hold a color/id)
 int board[BOARD_HEIGHT][BOARD_WIDTH];
 
@@ -55,8 +59,61 @@ void drawBlock(int col, int row, float r, float g, float b) {
     glEnd();
 }
 
+
+
+//---------------------Shape----------------
+
+
+void drawLShape() {
+    drawBlock(pieceCol , pieceRow, 0.2f, 0.6f, 0.1f);
+    drawBlock(pieceCol +1 , pieceRow, 0.2f, 0.6f, 0.1f);
+    drawBlock(pieceCol +2, pieceRow, 0.2f, 0.6f, 0.1f);
+    drawBlock(pieceCol , pieceRow +1, 0.2f, 0.6f, 0.1f);
+
+}
+
+
+
+void specialKeys(int key, int x , int y) {
+    if (key == GLUT_KEY_RIGHT)
+    {
+        if(pieceCol +3 < BOARD_WIDTH){
+            pieceCol++;
+        }
+       
+    }
+    if (key == GLUT_KEY_LEFT)
+    {
+        if (pieceCol > 0)
+        {
+            pieceCol--;
+        }
+    }
+
+    if (key == GLUT_KEY_DOWN)
+    {
+        if (pieceRow + 2 < BOARD_HEIGHT)
+        {
+            pieceRow++;
+        }
+    }
+
+    glutPostRedisplay();
+}
+
+
+
+
+
+
+
+
+
+
 // Draws the whole board: filled cells as blocks, empty cells as a faint grid
 void drawBoard() {
+      drawLShape();
+
     for (int row = 0; row < BOARD_HEIGHT; row++) {
         for (int col = 0; col < BOARD_WIDTH; col++) {
             if (board[row][col] == 0) {
