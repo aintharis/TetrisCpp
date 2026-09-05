@@ -22,12 +22,9 @@ void init() {
 }
 void game(){
     drawLShape();
-    if(pieceRow == 18){
-        board[pieceRow][pieceCol] = 1;
-        board[pieceRow][pieceCol+1] = 1;
-        board[pieceRow][pieceCol+2] = 1;
-        board[pieceRow+1][pieceCol] = 1;
-
+     if (!canMoveDown())
+    {
+        lockPiece();
         resetGame();
     }
 }
