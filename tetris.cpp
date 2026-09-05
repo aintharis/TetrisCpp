@@ -1,6 +1,7 @@
 #include <GL/glut.h>
 #include "game.h"
 #include <iostream>
+
 using namespace std;
 void resetGame() {
     glutPostRedisplay();
@@ -21,11 +22,11 @@ void init() {
     initBoard();
 }
 void game(){
-    drawLShape();
+   
      if (!canMoveDown())
     {
         lockPiece();
-        resetGame();
+        newPiece();
     }
 }
 // GLUT display callback
@@ -38,6 +39,8 @@ void display() {
 }
 
 int main(int argc, char** argv) {
+    srand(time(0));
+    
     glutInit(&argc, argv);
     glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGB);
     glutInitWindowSize(WINDOW_WIDTH, WINDOW_HEIGHT);
@@ -45,7 +48,7 @@ int main(int argc, char** argv) {
     glutCreateWindow("Tetris - Board");
     glutSpecialFunc(specialKeys);
     init();
-
+    newPiece();
     glutDisplayFunc(display);
     glutMainLoop();
 

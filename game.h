@@ -2,6 +2,8 @@
 #define BOARD_H
 
 #include <GL/glut.h>
+#include <cstdlib>
+#include <ctime>
 
 // ---------- Global board configuration ----------
 const int BOARD_WIDTH = 10;  // number of columns
@@ -64,6 +66,27 @@ void drawBlock(int col, int row, float r, float g, float b)
 }
 
 //---------------------Shape----------------
+int currentShape = 0;
+
+void newPiece()
+{
+    currentShape = rand() % 2;
+   
+
+    pieceRow = 0;
+    pieceCol = 3;
+}
+
+
+void drawTShape()
+{
+    drawBlock(pieceCol+1, pieceRow, 1.0f, 0.0f, 0.0f);
+    drawBlock(pieceCol, pieceRow+1, 1.0f, 0.0f, 0.0f);
+    drawBlock(pieceCol+1, pieceRow+1, 1.0f, 0.0f, 0.0f);
+    drawBlock(pieceCol+2, pieceRow+1, 1.0f, 0.0f, 0.0f);
+
+   
+}
 
 void drawLShape()
 {
@@ -79,18 +102,22 @@ bool canMoveDown()
     {
         return false;
     }
+
     if (board[pieceRow + 2][pieceCol] != 0)
     {
         return false;
     }
-    if (board[pieceRow + 1][pieceCol + 1] != 0)
+
+    if (board[pieceRow + 2][pieceCol + 1] != 0)
     {
         return false;
     }
-    if (board[pieceRow + 1][pieceCol + 2] != 0)
+
+    if (board[pieceRow + 2][pieceCol + 2] != 0)
     {
         return false;
     }
+
     return true;
 }
 bool canMoveRight()
@@ -127,10 +154,23 @@ bool canMoveleft()
 }
 void lockPiece()
 {
-    board[pieceRow][pieceCol] = 1;
-    board[pieceRow][pieceCol + 1] = 1;
-    board[pieceRow][pieceCol + 2] = 1;
-    board[pieceRow + 1][pieceCol] = 1;
+     if (currentShape == 0)
+    {
+        //L
+        board[pieceRow][pieceCol] = 1;
+        board[pieceRow][pieceCol + 1] = 1;
+        board[pieceRow][pieceCol + 2] = 1;
+        board[pieceRow + 1][pieceCol] = 1;
+    }
+    else
+    {
+        //T
+        board[pieceRow][pieceCol + 1] = 1;
+
+        board[pieceRow + 1][pieceCol] = 1;
+        board[pieceRow + 1][pieceCol + 1] = 1;
+        board[pieceRow + 1][pieceCol + 2] = 1;
+    }
 }
 
 void specialKeys(int key, int x, int y)
@@ -152,15 +192,15 @@ void specialKeys(int key, int x, int y)
 
     if (key == GLUT_KEY_DOWN)
     {
-        if (pieceRow + 2 < BOARD_HEIGHT)
+        if ( canMoveDown())
         {
             pieceRow++;
         }
         else
         {
             lockPiece();
-            pieceRow = 0;
-            pieceCol = 3;
+            newPiece();
+           
         }
     }
 
@@ -170,7 +210,14 @@ void specialKeys(int key, int x, int y)
 // Draws the whole board: filled cells as blocks, empty cells as a faint grid
 void drawBoard()
 {
+  if (currentShape == 0)
+{
     drawLShape();
+}
+else
+{
+    drawTShape();
+}
 
     for (int row = 0; row < BOARD_HEIGHT; row++)
     {
