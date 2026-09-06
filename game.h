@@ -56,20 +56,145 @@ void drawBlock(int col, int row, float r, float g, float b)
 }
 
 int currentShape = 0;
+int rotation = 0;
 
 void newPiece()
 {
     currentShape = rand() % 4;
-
+    rotation = 0;
     pieceRow = 0;
     pieceCol = 3;
 }
+void rotatePiece()
+{
+    rotation++;
+    if (rotation >= 4)
+    {
+        rotation = 0;
+    }
+}
+
+bool validRotation(int row, int col)
+{
+    if (row < 0 || row >= BOARD_HEIGHT || col < 0 || col >= BOARD_WIDTH)
+    {
+        return false;
+    }
+    if (board[row][col] != 0)
+    {
+        return false;
+    }
+    return true;
+}
+bool canRotate()
+{
+    int nextRotation = rotation + 1;
+    if (nextRotation >= 4)
+    {
+        nextRotation = 0;
+    }
+    if (currentShape == 0)
+    {
+        if (rotation == 0 || rotation == 2)
+        {
+            return validRotation(pieceCol, pieceRow) &&
+                   validRotation(pieceCol + 1, pieceRow) &&
+                   validRotation(pieceCol + 2, pieceRow) &&
+                   validRotation(pieceCol + 3, pieceRow);
+        }
+        return validRotation(pieceCol, pieceRow) &&
+               validRotation(pieceCol, pieceRow + 1) &&
+               validRotation(pieceCol, pieceRow + 2) &&
+               validRotation(pieceCol, pieceRow + 3);
+    }
+    else if (currentShape == 1)
+    {
+        return true;
+    }
+    else if (currentShape == 2)
+    {
+        if (nextRotation == 0)
+        {
+            return validRotation(pieceCol + 1, pieceRow) &&
+                   validRotation(pieceCol, pieceRow + 1) &&
+                   validRotation(pieceCol + 1, pieceRow + 1) &&
+                   validRotation(pieceCol + 2, pieceRow + 1);
+        }
+        if (nextRotation == 1)
+        {
+            return validRotation(pieceCol, pieceRow) &&
+                   validRotation(pieceCol, pieceRow + 1) &&
+                   validRotation(pieceCol + 1, pieceRow + 1) &&
+                   validRotation(pieceCol, pieceRow + 2);
+        }
+        if (nextRotation == 2)
+        {
+            return validRotation(pieceCol, pieceRow) &&
+                   validRotation(pieceCol + 1, pieceRow) &&
+                   validRotation(pieceCol + 2, pieceRow) &&
+                   validRotation(pieceCol + 1, pieceRow + 1);
+        }
+        if (nextRotation == 3)
+        {
+            return validRotation(pieceCol + 1, pieceRow) &&
+                   validRotation(pieceCol, pieceRow + 1) &&
+                   validRotation(pieceCol + 1, pieceRow + 1) &&
+                   validRotation(pieceCol + 1, pieceRow + 2);
+        }
+    }
+    else if (currentShape == 3)
+    {
+        if (nextRotation == 0)
+        {
+            return validRotation(pieceCol, pieceCol) &&
+                   validRotation(pieceCol, pieceCol + 1) &&
+                   validRotation(pieceCol, pieceCol + 2) &&
+                   validRotation(pieceCol + 1, pieceCol);
+        }
+
+        if (nextRotation == 1)
+        {
+            return validRotation(pieceCol, pieceCol) &&
+                   validRotation(pieceCol + 1, pieceCol) &&
+                   validRotation(pieceCol + 2, pieceCol) &&
+                   validRotation(pieceCol + 2, pieceCol + 1);
+        }
+
+        if (nextRotation == 2)
+        {
+            return validRotation(pieceCol + 1, pieceCol) &&
+                   validRotation(pieceCol + 1, pieceCol + 1) &&
+                   validRotation(pieceCol + 1, pieceCol + 2) &&
+                   validRotation(pieceCol, pieceCol + 2);
+        }
+
+        return validRotation(pieceCol, pieceCol) &&
+               validRotation(pieceCol, pieceCol + 1) &&
+               validRotation(pieceCol + 1, pieceCol + 1) &&
+               validRotation(pieceCol + 2, pieceCol + 1);
+    }
+    return false;
+}
+
 void drawIShape()
 {
-    drawBlock(pieceCol, pieceRow, 1.0f, 0.0f, 1.0f);
-    drawBlock(pieceCol+1, pieceRow, 1.0f, 0.0f, 1.0f);
-    drawBlock(pieceCol+2, pieceRow, 1.0f, 0.0f, 1.0f);
-    drawBlock(pieceCol+3, pieceRow, 1.0f, 0.0f, 1.0f);
+
+    if (rotation == 0 || rotation == 2)
+    {
+
+        drawBlock(pieceCol, pieceRow, 0.0f, 1.0f, 1.0f);
+        drawBlock(pieceCol + 1, pieceRow, 0.0f, 1.0f, 1.0f);
+        drawBlock(pieceCol + 2, pieceRow, 0.0f, 1.0f, 1.0f);
+        drawBlock(pieceCol + 3, pieceRow, 0.0f, 1.0f, 1.0f);
+    }
+    else
+    {
+
+        drawBlock(pieceCol, pieceRow, 0.0f, 1.0f, 1.0f);
+        drawBlock(pieceCol, pieceRow + 1, 0.0f, 1.0f, 1.0f);
+        drawBlock(pieceCol, pieceRow + 2, 0.0f, 1.0f, 1.0f);
+        drawBlock(pieceCol, pieceRow + 3, 0.0f, 1.0f, 1.0f);
+    }
 }
 
 void drawOShape()
@@ -82,285 +207,539 @@ void drawOShape()
 
 void drawTShape()
 {
-    drawBlock(pieceCol + 1, pieceRow, 1.0f, 0.0f, 0.0f);
-    drawBlock(pieceCol, pieceRow + 1, 1.0f, 0.0f, 0.0f);
-    drawBlock(pieceCol + 1, pieceRow + 1, 1.0f, 0.0f, 0.0f);
-    drawBlock(pieceCol + 2, pieceRow + 1, 1.0f, 0.0f, 0.0f);
+    if (rotation == 0)
+    {
+        // T
+        drawBlock(pieceCol + 1, pieceRow, 1.0f, 0.0f, 0.0f);
+        drawBlock(pieceCol, pieceRow + 1, 1.0f, 0.0f, 0.0f);
+        drawBlock(pieceCol + 1, pieceRow + 1, 1.0f, 0.0f, 0.0f);
+        drawBlock(pieceCol + 2, pieceRow + 1, 1.0f, 0.0f, 0.0f);
+    }
+    else if (rotation == 1)
+    {
+
+        drawBlock(pieceCol, pieceRow, 1.0f, 0.0f, 0.0f);
+        drawBlock(pieceCol, pieceRow + 1, 1.0f, 0.0f, 0.0f);
+        drawBlock(pieceCol + 1, pieceRow + 1, 1.0f, 0.0f, 0.0f);
+        drawBlock(pieceCol, pieceRow + 2, 1.0f, 0.0f, 0.0f);
+    }
+    else if (rotation == 2)
+    {
+
+        drawBlock(pieceCol, pieceRow, 1.0f, 0.0f, 0.0f);
+        drawBlock(pieceCol + 1, pieceRow, 1.0f, 0.0f, 0.0f);
+        drawBlock(pieceCol + 2, pieceRow, 1.0f, 0.0f, 0.0f);
+        drawBlock(pieceCol + 1, pieceRow + 1, 1.0f, 0.0f, 0.0f);
+    }
+    else if (rotation == 3)
+    {
+
+        drawBlock(pieceCol + 1, pieceRow, 1.0f, 0.0f, 0.0f);
+        drawBlock(pieceCol, pieceRow + 1, 1.0f, 0.0f, 0.0f);
+        drawBlock(pieceCol + 1, pieceRow + 1, 1.0f, 0.0f, 0.0f);
+        drawBlock(pieceCol + 1, pieceRow + 2, 1.0f, 0.0f, 0.0f);
+    }
 }
 
 void drawLShape()
 {
-    drawBlock(pieceCol, pieceRow, 0.2f, 0.6f, 0.1f);
-    drawBlock(pieceCol + 1, pieceRow, 0.2f, 0.6f, 0.1f);
-    drawBlock(pieceCol + 2, pieceRow, 0.2f, 0.6f, 0.1f);
-    drawBlock(pieceCol, pieceRow + 1, 0.2f, 0.6f, 0.1f);
-}
 
+    if (rotation == 0)
+    {
+        drawBlock(pieceCol, pieceRow, 0.2f, 0.6f, 0.1f);
+        drawBlock(pieceCol + 1, pieceRow, 0.2f, 0.6f, 0.1f);
+        drawBlock(pieceCol + 2, pieceRow, 0.2f, 0.6f, 0.1f);
+        drawBlock(pieceCol, pieceRow + 1, 0.2f, 0.6f, 0.1f);
+    }
+    else if(rotation == 1)
+    {
+        drawBlock(pieceCol, pieceRow, 0.2f, 0.6f, 0.1f);
+        drawBlock(pieceCol, pieceRow + 1, 0.2f, 0.6f, 0.1f);
+        drawBlock(pieceCol, pieceRow + 2, 0.2f, 0.6f, 0.1f);
+        drawBlock(pieceCol + 1, pieceRow + 2, 0.2f, 0.6f, 0.1f);
+    }
+    else if (rotation == 2)
+    {
+
+        drawBlock(pieceCol, pieceRow + 1, 0.2f, 0.6f, 0.1f);
+        drawBlock(pieceCol + 1, pieceRow + 1, 0.2f, 0.6f, 0.1f);
+        drawBlock(pieceCol + 2, pieceRow + 1, 0.2f, 0.6f, 0.1f);
+        drawBlock(pieceCol + 2, pieceRow, 0.2f, 0.6f, 0.1f);
+    }
+    else if (rotation == 3)
+    {
+
+        drawBlock(pieceCol, pieceRow, 0.2f, 0.6f, 0.1f);
+        drawBlock(pieceCol + 1, pieceRow, 0.2f, 0.6f, 0.1f);
+        drawBlock(pieceCol + 1, pieceRow + 1, 0.2f, 0.6f, 0.1f);
+        drawBlock(pieceCol + 1, pieceRow + 2, 0.2f, 0.6f, 0.1f);
+    }
+}
 bool canMoveDown()
 {
-    if (currentShape == 0)
+    if (currentShape == 0) // I
     {
-        //L
-        if (pieceRow + 2 >= BOARD_HEIGHT)
+        if (rotation == 0 || rotation == 2)
         {
-            return false;
-        }
+            if (pieceRow + 1 >= BOARD_HEIGHT)
+                return false;
 
-        if (board[pieceRow + 2][pieceCol] != 0)
-        {
-            return false;
+            for (int i = 0; i < 4; i++)
+            {
+                if (board[pieceRow + 1][pieceCol + i] != 0)
+                    return false;
+            }
         }
-
-        if (board[pieceRow + 1][pieceCol + 1] != 0)
+        else
         {
-            return false;
-        }
+            if (pieceRow + 4 >= BOARD_HEIGHT)
+                return false;
 
-        if (board[pieceRow + 1][pieceCol + 2] != 0)
-        {
-            return false;
+            if (board[pieceRow + 4][pieceCol] != 0)
+                return false;
         }
     }
-    else if (currentShape == 1)
+
+    else if (currentShape == 1) // O
     {
-        //T
         if (pieceRow + 2 >= BOARD_HEIGHT)
-        {
             return false;
-        }
 
         if (board[pieceRow + 2][pieceCol] != 0)
-        {
             return false;
-        }
 
         if (board[pieceRow + 2][pieceCol + 1] != 0)
-        {
             return false;
+    }
+
+    else if (currentShape == 2) // T
+    {
+        if (rotation == 0)
+        {
+            if (pieceRow + 2 >= BOARD_HEIGHT)
+                return false;
+
+            if (board[pieceRow + 2][pieceCol] != 0 ||
+                board[pieceRow + 2][pieceCol + 1] != 0 ||
+                board[pieceRow + 2][pieceCol + 2] != 0)
+                return false;
         }
 
-        if (board[pieceRow + 2][pieceCol + 2] != 0)
+        else if (rotation == 1)
         {
-            return false;
-        }
-    }
-    else if (currentShape == 2)
-    {
-        //O
-        if (pieceRow + 2 >= BOARD_HEIGHT)
-        {
-            return false;
+            if (pieceRow + 3 >= BOARD_HEIGHT)
+                return false;
+
+            if (board[pieceRow + 3][pieceCol] != 0)
+                return false;
         }
 
-        if (board[pieceRow + 2][pieceCol] != 0)
+        else if (rotation == 2)
         {
-            return false;
+            if (pieceRow + 2 >= BOARD_HEIGHT)
+                return false;
+
+            if (board[pieceRow + 2][pieceCol + 1] != 0)
+                return false;
         }
 
-        if (board[pieceRow + 2][pieceCol + 1] != 0)
+        else if (rotation == 3)
         {
-            return false;
+            if (pieceRow + 3 >= BOARD_HEIGHT)
+                return false;
+
+            if (board[pieceRow + 3][pieceCol + 1] != 0)
+                return false;
         }
     }
-    else if (currentShape == 3)
-{
-    //I
-    if (pieceRow + 1 >= BOARD_HEIGHT)
-    {
-        return false;
-    }
 
-    if (board[pieceRow + 1][pieceCol] != 0)
+    else if (currentShape == 3) // L
     {
-        return false;
-    }
+        if (rotation == 0)
+        {
+            if (pieceRow + 2 >= BOARD_HEIGHT)
+                return false;
 
-    if (board[pieceRow + 1][pieceCol + 1] != 0)
-    {
-        return false;
-    }
+            if (board[pieceRow + 2][pieceCol] != 0)
+                return false;
+        }
 
-    if (board[pieceRow + 1][pieceCol + 2] != 0)
-    {
-        return false;
-    }
+        else if (rotation == 1)
+        {
+            if (pieceRow + 3 >= BOARD_HEIGHT)
+                return false;
 
-    if (board[pieceRow + 1][pieceCol + 3] != 0)
-    {
-        return false;
+            if (board[pieceRow + 3][pieceCol] != 0 ||
+                board[pieceRow + 3][pieceCol + 1] != 0)
+                return false;
+        }
+
+        else if (rotation == 2)
+        {
+            if (pieceRow + 2 >= BOARD_HEIGHT)
+                return false;
+
+            if (board[pieceRow + 2][pieceCol] != 0 ||
+                board[pieceRow + 2][pieceCol + 1] != 0 ||
+                board[pieceRow + 2][pieceCol + 2] != 0)
+                return false;
+        }
+
+        else if (rotation == 3)
+        {
+            if (pieceRow + 3 >= BOARD_HEIGHT)
+                return false;
+
+            if (board[pieceRow + 3][pieceCol + 1] != 0)
+                return false;
+        }
     }
-}
 
     return true;
 }
 
 bool canMoveleft()
 {
-    if (currentShape == 0)
+    if (currentShape == 0) // I
     {
-        //L
         if (pieceCol <= 0)
-        {
             return false;
-        }
 
-        if (board[pieceRow][pieceCol - 1] != 0)
+        if (rotation == 0 || rotation == 2)
         {
-            return false;
+            if (board[pieceRow][pieceCol - 1] != 0)
+                return false;
         }
-
-        if (board[pieceRow + 1][pieceCol - 1] != 0)
+        else
         {
-            return false;
+            if (board[pieceRow][pieceCol - 1] != 0 ||
+                board[pieceRow + 1][pieceCol - 1] != 0 ||
+                board[pieceRow + 2][pieceCol - 1] != 0 ||
+                board[pieceRow + 3][pieceCol - 1] != 0)
+                return false;
         }
     }
-    else if (currentShape == 1)
+
+    else if (currentShape == 1) // O
     {
-        //T
         if (pieceCol <= 0)
-        {
             return false;
-        }
 
-        if (board[pieceRow + 1][pieceCol - 1] != 0)
-        {
+        if (board[pieceRow][pieceCol - 1] != 0 ||
+            board[pieceRow + 1][pieceCol - 1] != 0)
             return false;
-        }
     }
-    else if (currentShape == 2)
+
+    else if (currentShape == 2) // T
     {
-        //O
         if (pieceCol <= 0)
-        {
             return false;
+
+        if (rotation == 0)
+        {
+            if (board[pieceRow + 1][pieceCol - 1] != 0)
+                return false;
         }
 
-        if (board[pieceRow][pieceCol - 1] != 0)
+        else if (rotation == 1)
         {
-            return false;
+            if (board[pieceRow][pieceCol - 1] != 0 ||
+                board[pieceRow + 1][pieceCol - 1] != 0 ||
+                board[pieceRow + 2][pieceCol - 1] != 0)
+                return false;
         }
 
-        if (board[pieceRow + 1][pieceCol - 1] != 0)
+        else if (rotation == 2)
         {
-            return false;
+            if (board[pieceRow][pieceCol - 1] != 0)
+                return false;
+        }
+
+        else if (rotation == 3)
+        {
+            if (board[pieceRow + 1][pieceCol - 1] != 0)
+                return false;
         }
     }
-    else if (currentShape == 3)
-{
-    //I
-    if (pieceCol <= 0)
+
+    else if (currentShape == 3) // L
     {
-        return false;
-    }
+        if (pieceCol <= 0)
+            return false;
 
-    if (board[pieceRow][pieceCol - 1] != 0)
-    {
-        return false;
+        if (rotation == 0)
+        {
+            if (board[pieceRow][pieceCol - 1] != 0 ||
+                board[pieceRow + 1][pieceCol - 1] != 0)
+                return false;
+        }
+
+        else if (rotation == 1)
+        {
+            if (board[pieceRow][pieceCol - 1] != 0 ||
+                board[pieceRow + 1][pieceCol - 1] != 0 ||
+                board[pieceRow + 2][pieceCol - 1] != 0)
+                return false;
+        }
+
+        else if (rotation == 2)
+        {
+            if (board[pieceRow + 1][pieceCol - 1] != 0)
+                return false;
+        }
+
+        else if (rotation == 3)
+        {
+            if (board[pieceRow][pieceCol - 1] != 0)
+                return false;
+        }
     }
-}
 
     return true;
 }
-
 bool canMoveRight()
 {
-    if (currentShape == 0)
+    if (currentShape == 0) // I
     {
-        //L
-        if (pieceCol + 3 >= BOARD_WIDTH)
+        if (rotation == 0 || rotation == 2)
         {
-            return false;
-        }
+            if (pieceCol + 4 >= BOARD_WIDTH)
+                return false;
 
-        if (board[pieceRow][pieceCol + 3] != 0)
+            if (board[pieceRow][pieceCol + 4] != 0)
+                return false;
+        }
+        else
         {
-            return false;
+            if (pieceCol + 1 >= BOARD_WIDTH)
+                return false;
+
+            if (board[pieceRow][pieceCol + 1] != 0 ||
+                board[pieceRow + 1][pieceCol + 1] != 0 ||
+                board[pieceRow + 2][pieceCol + 1] != 0 ||
+                board[pieceRow + 3][pieceCol + 1] != 0)
+                return false;
         }
     }
-    else if (currentShape == 1)
-    {
-        //T
-        if (pieceCol + 3 >= BOARD_WIDTH)
-        {
-            return false;
-        }
 
-        if (board[pieceRow + 1][pieceCol + 3] != 0)
-        {
-            return false;
-        }
-    }
-    else if (currentShape == 2)
+    else if (currentShape == 1) // O
     {
-        //O
         if (pieceCol + 2 >= BOARD_WIDTH)
-        {
             return false;
-        }
 
-        if (board[pieceRow][pieceCol + 2] != 0)
-        {
+        if (board[pieceRow][pieceCol + 2] != 0 ||
+            board[pieceRow + 1][pieceCol + 2] != 0)
             return false;
-        }
+    }
 
-        if (board[pieceRow + 1][pieceCol + 2] != 0)
-        {
-            return false;
-        }
-    }
-    else if (currentShape == 3)
-{
-    //I
-    if(pieceCol+4 >=BOARD_WIDTH){
-        return false;
-    }
-    if(board[pieceRow][pieceCol+4]!=0)
+    else if (currentShape == 2) // T
     {
-        return false;
+        if (rotation == 0)
+        {
+            if (pieceCol + 3 >= BOARD_WIDTH)
+                return false;
+
+            if (board[pieceRow + 1][pieceCol + 3] != 0)
+                return false;
+        }
+
+        else if (rotation == 1)
+        {
+            if (pieceCol + 2 >= BOARD_WIDTH)
+                return false;
+
+            if (board[pieceRow][pieceCol + 2] != 0 ||
+                board[pieceRow + 1][pieceCol + 2] != 0 ||
+                board[pieceRow + 2][pieceCol + 2] != 0)
+                return false;
+        }
+
+        else if (rotation == 2)
+        {
+            if (pieceCol + 3 >= BOARD_WIDTH)
+                return false;
+
+            if (board[pieceRow][pieceCol + 3] != 0)
+                return false;
+        }
+
+        else if (rotation == 3)
+        {
+            if (pieceCol + 2 >= BOARD_WIDTH)
+                return false;
+
+            if (board[pieceRow][pieceCol + 2] != 0 ||
+                board[pieceRow + 1][pieceCol + 2] != 0 ||
+                board[pieceRow + 2][pieceCol + 2] != 0)
+                return false;
+        }
     }
-}
+
+    else if (currentShape == 3) // L
+    {
+        if (rotation == 0)
+        {
+            if (pieceCol + 3 >= BOARD_WIDTH)
+                return false;
+
+            if (board[pieceRow][pieceCol + 3] != 0)
+                return false;
+        }
+
+        else if (rotation == 1)
+        {
+            if (pieceCol + 2 >= BOARD_WIDTH)
+                return false;
+
+            if (board[pieceRow + 2][pieceCol + 2] != 0)
+                return false;
+        }
+
+        else if (rotation == 2)
+        {
+            if (pieceCol + 3 >= BOARD_WIDTH)
+                return false;
+
+            if (board[pieceRow + 1][pieceCol + 3] != 0 ||
+                board[pieceRow][pieceCol + 3] != 0)
+                return false;
+        }
+
+        else if (rotation == 3)
+        {
+            if (pieceCol + 2 >= BOARD_WIDTH)
+                return false;
+
+            if (board[pieceRow][pieceCol + 2] != 0 ||
+                board[pieceRow + 1][pieceCol + 2] != 0 ||
+                board[pieceRow + 2][pieceCol + 2] != 0)
+                return false;
+        }
+    }
 
     return true;
 }
-
 void lockPiece()
 {
-    if (currentShape == 0)
+    if (currentShape == 0) // I
     {
-        //L
-        board[pieceRow][pieceCol] = 1;
-        board[pieceRow][pieceCol + 1] = 1;
-        board[pieceRow][pieceCol + 2] = 1;
-        board[pieceRow + 1][pieceCol] = 1;
+        if (rotation == 0 || rotation == 2)
+        {
+            board[pieceRow][pieceCol] = currentShape + 1;
+            board[pieceRow][pieceCol + 1] = currentShape + 1;
+            board[pieceRow][pieceCol + 2] = currentShape + 1;
+            board[pieceRow][pieceCol + 3] = currentShape + 1;
+        }
+        else
+        {
+            board[pieceRow][pieceCol] = currentShape + 1;
+            board[pieceRow + 1][pieceCol] = currentShape + 1;
+            board[pieceRow + 2][pieceCol] = currentShape + 1;
+            board[pieceRow + 3][pieceCol] = currentShape + 1;
+        }
     }
-    else if (currentShape == 1)
+
+    else if (currentShape == 1) // O
     {
-        //T
-        board[pieceRow][pieceCol + 1] = 1;
-        board[pieceRow + 1][pieceCol] = 1;
-        board[pieceRow + 1][pieceCol + 1] = 1;
-        board[pieceRow + 1][pieceCol + 2] = 1;
+        board[pieceRow][pieceCol] = currentShape + 1;
+        board[pieceRow][pieceCol + 1] = currentShape + 1;
+        board[pieceRow + 1][pieceCol] = currentShape + 1;
+        board[pieceRow + 1][pieceCol + 1] = currentShape + 1;
     }
-    else if (currentShape == 2)
+
+    else if (currentShape == 2) // T
     {
-        //O
-        board[pieceRow][pieceCol] = 1;
-        board[pieceRow][pieceCol + 1] = 1;
-        board[pieceRow + 1][pieceCol] = 1;
-        board[pieceRow + 1][pieceCol + 1] = 1;
+        if (rotation == 0)
+        {
+            board[pieceRow][pieceCol + 1] = currentShape + 1;
+
+            board[pieceRow + 1][pieceCol] = currentShape + 1;
+            board[pieceRow + 1][pieceCol + 1] = currentShape + 1;
+            board[pieceRow + 1][pieceCol + 2] = currentShape + 1;
+        }
+
+        else if (rotation == 1)
+        {
+            board[pieceRow][pieceCol] = currentShape + 1;
+
+            board[pieceRow + 1][pieceCol] = currentShape + 1;
+            board[pieceRow + 1][pieceCol + 1] = currentShape + 1;
+
+            board[pieceRow + 2][pieceCol] = currentShape + 1;
+        }
+
+        else if (rotation == 2)
+        {
+            board[pieceRow][pieceCol] = currentShape + 1;
+            board[pieceRow][pieceCol + 1] = currentShape + 1;
+            board[pieceRow][pieceCol + 2] = currentShape + 1;
+
+            board[pieceRow + 1][pieceCol + 1] = currentShape + 1;
+        }
+
+        else if (rotation == 3)
+        {
+            board[pieceRow][pieceCol + 1] = currentShape + 1;
+
+            board[pieceRow + 1][pieceCol] = currentShape + 1;
+            board[pieceRow + 1][pieceCol + 1] = currentShape + 1;
+
+            board[pieceRow + 2][pieceCol + 1] = currentShape + 1;
+        }
     }
-    else if (currentShape == 3)
-{
-    //I
-    board[pieceRow][pieceCol] = 1;
-    board[pieceRow][pieceCol + 1] = 1;
-    board[pieceRow][pieceCol + 2] = 1;
-    board[pieceRow][pieceCol + 3] = 1;
-}
+
+    else if (currentShape == 3) // L
+    {
+        if (rotation == 0)
+        {
+            board[pieceRow][pieceCol] = currentShape + 1;
+            board[pieceRow][pieceCol + 1] = currentShape + 1;
+            board[pieceRow][pieceCol + 2] = currentShape + 1;
+
+            board[pieceRow + 1][pieceCol] = currentShape + 1;
+        }
+
+        else if (rotation == 1)
+        {
+            board[pieceRow][pieceCol] = currentShape + 1;
+
+            board[pieceRow + 1][pieceCol] = currentShape + 1;
+
+            board[pieceRow + 2][pieceCol] = currentShape + 1;
+            board[pieceRow + 2][pieceCol + 1] = currentShape + 1;
+        }
+
+        else if (rotation == 2)
+        {
+            board[pieceRow][pieceCol + 1] = currentShape + 1;
+
+            board[pieceRow + 1][pieceCol + 1] = currentShape + 1;
+
+            board[pieceRow + 2][pieceCol] = currentShape + 1;
+            board[pieceRow + 2][pieceCol + 1] = currentShape + 1;
+        }
+
+        else if (rotation == 3)
+        {
+            board[pieceRow][pieceCol] = currentShape + 1;
+            board[pieceRow][pieceCol + 1] = currentShape + 1;
+
+            board[pieceRow + 1][pieceCol + 1] = currentShape + 1;
+
+            board[pieceRow + 2][pieceCol + 1] = currentShape + 1;
+        }
+    }
 }
 
 void specialKeys(int key, int x, int y)
 {
+    if (key == GLUT_KEY_UP)
+{
+    if (canRotate())
+    {
+        rotatePiece();
+    }
+}
     if (key == GLUT_KEY_RIGHT)
     {
         if (canMoveRight())
@@ -397,24 +776,24 @@ void drawBoard()
 {
     if (currentShape == 0)
     {
-        //L
-        drawLShape();
+        //I
+        drawIShape();
     }
     else if (currentShape == 1)
-    {
-        //T
-        drawTShape();
-    }
-    else if (currentShape == 2)
     {
         //O
         drawOShape();
     }
+    else if (currentShape == 2)
+    {
+        //T
+        drawTShape();
+    }
     else if (currentShape == 3)
-{
-    //I
-    drawIShape();
-}
+    {
+        //L
+        drawLShape();
+    }
 
     for (int row = 0; row < BOARD_HEIGHT; row++)
     {
@@ -433,10 +812,25 @@ void drawBoard()
                 glVertex2i(px, py + BLOCK_SIZE);
                 glEnd();
             }
-            else
-            {
-                drawBlock(col, row, 0.2f, 0.6f, 1.0f);
-            }
+           else
+{
+    if (board[row][col] == 1) // I
+    {
+        drawBlock(col, row, 0.0f, 1.0f, 1.0f);
+    }
+    else if (board[row][col] == 2) // O
+    {
+        drawBlock(col, row, 1.0f, 1.0f, 0.0f);
+    }
+    else if (board[row][col] == 3) // T
+    {
+        drawBlock(col, row, 1.0f, 0.0f, 0.0f);
+    }
+    else if (board[row][col] == 4) // L
+    {
+        drawBlock(col, row, 0.2f, 0.6f, 0.1f);
+    }
+}
         }
     }
 }
