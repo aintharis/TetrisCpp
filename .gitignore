@@ -1,12 +1,4 @@
-# Object and library files
-*.o
-*.a
-*.so
 
-# Executables with common extensions or extensionless
-*.out
-*.app
-
-# Build directories
-build/
-bin/
+*
+!*.*
+!*/
