@@ -5,6 +5,8 @@
 #include <GL/glut.h>
 #include <cstdlib>
 #include <ctime>
+#include <iostream>
+using namespace std;
 
 const int BOARD_WIDTH = 10;
 const int BOARD_HEIGHT = 20;
@@ -57,13 +59,21 @@ void drawBlock(int col, int row, float r, float g, float b)
 
 int currentShape = 0;
 int rotation = 0;
-
+int score = 0;
+bool GameOver = false;
+bool canSpawnPiece();
 void newPiece()
 {
     currentShape = rand() % 4;
     rotation = 0;
     pieceRow = 0;
     pieceCol = 3;
+
+    if (!canSpawnPiece())
+    {
+        GameOver = true;
+        cout << " GAME OVER! " << endl;
+    }
 }
 void rotatePiece()
 {
@@ -89,90 +99,109 @@ bool validRotation(int row, int col)
 bool canRotate()
 {
     int nextRotation = rotation + 1;
+
     if (nextRotation >= 4)
     {
         nextRotation = 0;
     }
+
+    // I SHAPE
     if (currentShape == 0)
     {
-        if (rotation == 0 || rotation == 2)
+        if (nextRotation == 0 || nextRotation == 2)
         {
-            return validRotation(pieceCol, pieceRow) &&
-                   validRotation(pieceCol + 1, pieceRow) &&
-                   validRotation(pieceCol + 2, pieceRow) &&
-                   validRotation(pieceCol + 3, pieceRow);
+            return validRotation(pieceRow, pieceCol) &&
+                   validRotation(pieceRow, pieceCol + 1) &&
+                   validRotation(pieceRow, pieceCol + 2) &&
+                   validRotation(pieceRow, pieceCol + 3);
         }
-        return validRotation(pieceCol, pieceRow) &&
-               validRotation(pieceCol, pieceRow + 1) &&
-               validRotation(pieceCol, pieceRow + 2) &&
-               validRotation(pieceCol, pieceRow + 3);
+        else
+        {
+            return validRotation(pieceRow, pieceCol) &&
+                   validRotation(pieceRow + 1, pieceCol) &&
+                   validRotation(pieceRow + 2, pieceCol) &&
+                   validRotation(pieceRow + 3, pieceCol);
+        }
     }
+
+    // O SHAPE
     else if (currentShape == 1)
     {
         return true;
     }
+
+    // T SHAPE
     else if (currentShape == 2)
     {
         if (nextRotation == 0)
         {
-            return validRotation(pieceCol + 1, pieceRow) &&
-                   validRotation(pieceCol, pieceRow + 1) &&
-                   validRotation(pieceCol + 1, pieceRow + 1) &&
-                   validRotation(pieceCol + 2, pieceRow + 1);
+            return validRotation(pieceRow, pieceCol + 1) &&
+                   validRotation(pieceRow + 1, pieceCol) &&
+                   validRotation(pieceRow + 1, pieceCol + 1) &&
+                   validRotation(pieceRow + 1, pieceCol + 2);
         }
-        if (nextRotation == 1)
+
+        else if (nextRotation == 1)
         {
-            return validRotation(pieceCol, pieceRow) &&
-                   validRotation(pieceCol, pieceRow + 1) &&
-                   validRotation(pieceCol + 1, pieceRow + 1) &&
-                   validRotation(pieceCol, pieceRow + 2);
+            return validRotation(pieceRow, pieceCol) &&
+                   validRotation(pieceRow + 1, pieceCol) &&
+                   validRotation(pieceRow + 1, pieceCol + 1) &&
+                   validRotation(pieceRow + 2, pieceCol);
         }
-        if (nextRotation == 2)
+
+        else if (nextRotation == 2)
         {
-            return validRotation(pieceCol, pieceRow) &&
-                   validRotation(pieceCol + 1, pieceRow) &&
-                   validRotation(pieceCol + 2, pieceRow) &&
-                   validRotation(pieceCol + 1, pieceRow + 1);
+            return validRotation(pieceRow, pieceCol) &&
+                   validRotation(pieceRow, pieceCol + 1) &&
+                   validRotation(pieceRow, pieceCol + 2) &&
+                   validRotation(pieceRow + 1, pieceCol + 1);
         }
-        if (nextRotation == 3)
+
+        else
         {
-            return validRotation(pieceCol + 1, pieceRow) &&
-                   validRotation(pieceCol, pieceRow + 1) &&
-                   validRotation(pieceCol + 1, pieceRow + 1) &&
-                   validRotation(pieceCol + 1, pieceRow + 2);
+            return validRotation(pieceRow, pieceCol + 1) &&
+                   validRotation(pieceRow + 1, pieceCol) &&
+                   validRotation(pieceRow + 1, pieceCol + 1) &&
+                   validRotation(pieceRow + 2, pieceCol + 1);
         }
     }
+
+    // L SHAPE
     else if (currentShape == 3)
     {
         if (nextRotation == 0)
         {
-            return validRotation(pieceCol, pieceCol) &&
-                   validRotation(pieceCol, pieceCol + 1) &&
-                   validRotation(pieceCol, pieceCol + 2) &&
-                   validRotation(pieceCol + 1, pieceCol);
+            return validRotation(pieceRow, pieceCol) &&
+                   validRotation(pieceRow, pieceCol + 1) &&
+                   validRotation(pieceRow, pieceCol + 2) &&
+                   validRotation(pieceRow + 1, pieceCol);
         }
 
-        if (nextRotation == 1)
+        else if (nextRotation == 1)
         {
-            return validRotation(pieceCol, pieceCol) &&
-                   validRotation(pieceCol + 1, pieceCol) &&
-                   validRotation(pieceCol + 2, pieceCol) &&
-                   validRotation(pieceCol + 2, pieceCol + 1);
+            return validRotation(pieceRow, pieceCol) &&
+                   validRotation(pieceRow + 1, pieceCol) &&
+                   validRotation(pieceRow + 2, pieceCol) &&
+                   validRotation(pieceRow + 2, pieceCol + 1);
         }
 
-        if (nextRotation == 2)
+        else if (nextRotation == 2)
         {
-            return validRotation(pieceCol + 1, pieceCol) &&
-                   validRotation(pieceCol + 1, pieceCol + 1) &&
-                   validRotation(pieceCol + 1, pieceCol + 2) &&
-                   validRotation(pieceCol, pieceCol + 2);
+            return validRotation(pieceRow, pieceCol + 2) &&
+                   validRotation(pieceRow + 1, pieceCol) &&
+                   validRotation(pieceRow + 1, pieceCol + 1) &&
+                   validRotation(pieceRow + 1, pieceCol + 2);
         }
 
-        return validRotation(pieceCol, pieceCol) &&
-               validRotation(pieceCol, pieceCol + 1) &&
-               validRotation(pieceCol + 1, pieceCol + 1) &&
-               validRotation(pieceCol + 2, pieceCol + 1);
+        else
+        {
+            return validRotation(pieceRow, pieceCol) &&
+                   validRotation(pieceRow, pieceCol + 1) &&
+                   validRotation(pieceRow + 1, pieceCol + 1) &&
+                   validRotation(pieceRow + 2, pieceCol + 1);
+        }
     }
+
     return false;
 }
 
@@ -251,7 +280,7 @@ void drawLShape()
         drawBlock(pieceCol + 2, pieceRow, 0.2f, 0.6f, 0.1f);
         drawBlock(pieceCol, pieceRow + 1, 0.2f, 0.6f, 0.1f);
     }
-    else if(rotation == 1)
+    else if (rotation == 1)
     {
         drawBlock(pieceCol, pieceRow, 0.2f, 0.6f, 0.1f);
         drawBlock(pieceCol, pieceRow + 1, 0.2f, 0.6f, 0.1f);
@@ -695,7 +724,6 @@ void lockPiece()
             board[pieceRow][pieceCol] = currentShape + 1;
             board[pieceRow][pieceCol + 1] = currentShape + 1;
             board[pieceRow][pieceCol + 2] = currentShape + 1;
-
             board[pieceRow + 1][pieceCol] = currentShape + 1;
         }
 
@@ -711,14 +739,12 @@ void lockPiece()
 
         else if (rotation == 2)
         {
-            board[pieceRow][pieceCol + 1] = currentShape + 1;
+            board[pieceRow][pieceCol + 2] = currentShape + 1;
 
+            board[pieceRow + 1][pieceCol] = currentShape + 1;
             board[pieceRow + 1][pieceCol + 1] = currentShape + 1;
-
-            board[pieceRow + 2][pieceCol] = currentShape + 1;
-            board[pieceRow + 2][pieceCol + 1] = currentShape + 1;
+            board[pieceRow + 1][pieceCol + 2] = currentShape + 1;
         }
-
         else if (rotation == 3)
         {
             board[pieceRow][pieceCol] = currentShape + 1;
@@ -730,16 +756,162 @@ void lockPiece()
         }
     }
 }
+void clearLine()
+{
+    for (int row = BOARD_HEIGHT - 1; row >= 0; row--)
+    {
+        cout << "Row " << row << ": ";
+
+        for (int col = 0; col < BOARD_WIDTH; col++)
+        {
+            cout << board[row][col] << " ";
+        }
+
+        cout << endl;
+
+        bool full = true;
+
+        for (int col = 0; col < BOARD_WIDTH; col++)
+        {
+            if (board[row][col] == 0)
+            {
+                full = false;
+                break;
+            }
+        }
+
+        if (full)
+        {
+            cout << "FULL ROW FOUND: " << row << endl;
+
+            for (int r = row; r > 0; r--)
+            {
+                for (int col = 0; col < BOARD_WIDTH; col++)
+                {
+                    board[r][col] = board[r - 1][col];
+                }
+            }
+
+            for (int col = 0; col < BOARD_WIDTH; col++)
+            {
+                board[0][col] = 0;
+            }
+
+            score += 100;
+        }
+    }
+}
+
+bool canSpawnPiece()
+{
+    if (currentShape == 0) // I
+    {
+        if (rotation == 0 || rotation == 2)
+        {
+            return validRotation(0, 3) &&
+                   validRotation(0, 4) &&
+                   validRotation(0, 5) &&
+                   validRotation(0, 6);
+        }
+        else
+        {
+            return validRotation(0, 3) &&
+                   validRotation(1, 3) &&
+                   validRotation(2, 3) &&
+                   validRotation(3, 3);
+        }
+    }
+
+    else if (currentShape == 1) // O
+    {
+        return validRotation(0, 3) &&
+               validRotation(0, 4) &&
+               validRotation(1, 3) &&
+               validRotation(1, 4);
+    }
+
+    else if (currentShape == 2) // T
+    {
+        if (rotation == 0)
+        {
+            return validRotation(0, 4) &&
+                   validRotation(1, 3) &&
+                   validRotation(1, 4) &&
+                   validRotation(1, 5);
+        }
+
+        else if (rotation == 1)
+        {
+            return validRotation(0, 3) &&
+                   validRotation(1, 3) &&
+                   validRotation(1, 4) &&
+                   validRotation(2, 3);
+        }
+
+        else if (rotation == 2)
+        {
+            return validRotation(0, 3) &&
+                   validRotation(0, 4) &&
+                   validRotation(0, 5) &&
+                   validRotation(1, 4);
+        }
+
+        else
+        {
+            return validRotation(0, 4) &&
+                   validRotation(1, 3) &&
+                   validRotation(1, 4) &&
+                   validRotation(2, 4);
+        }
+    }
+
+    else if (currentShape == 3) // L
+    {
+        if (rotation == 0)
+        {
+            return validRotation(0, 3) &&
+                   validRotation(0, 4) &&
+                   validRotation(0, 5) &&
+                   validRotation(1, 3);
+        }
+
+        else if (rotation == 1)
+        {
+            return validRotation(0, 3) &&
+                   validRotation(1, 3) &&
+                   validRotation(2, 3) &&
+                   validRotation(2, 4);
+        }
+
+        else if (rotation == 2)
+        {
+            return validRotation(0, 5) &&
+                   validRotation(1, 3) &&
+                   validRotation(1, 4) &&
+                   validRotation(1, 5);
+        }
+
+        else
+        {
+            return validRotation(0, 3) &&
+                   validRotation(0, 4) &&
+                   validRotation(1, 4) &&
+                   validRotation(2, 4);
+        }
+    }
+
+    return false;
+}
 
 void specialKeys(int key, int x, int y)
 {
     if (key == GLUT_KEY_UP)
-{
-    if (canRotate())
     {
-        rotatePiece();
+        if (canRotate())
+        {
+            rotatePiece();
+        }
     }
-}
     if (key == GLUT_KEY_RIGHT)
     {
         if (canMoveRight())
@@ -758,6 +930,10 @@ void specialKeys(int key, int x, int y)
 
     if (key == GLUT_KEY_DOWN)
     {
+        if (GameOver)
+        {
+            return;
+        }
         if (canMoveDown())
         {
             pieceRow++;
@@ -765,6 +941,7 @@ void specialKeys(int key, int x, int y)
         else
         {
             lockPiece();
+            clearLine();
             newPiece();
         }
     }
@@ -776,22 +953,22 @@ void drawBoard()
 {
     if (currentShape == 0)
     {
-        //I
+        // I
         drawIShape();
     }
     else if (currentShape == 1)
     {
-        //O
+        // O
         drawOShape();
     }
     else if (currentShape == 2)
     {
-        //T
+        // T
         drawTShape();
     }
     else if (currentShape == 3)
     {
-        //L
+        // L
         drawLShape();
     }
 
@@ -812,25 +989,25 @@ void drawBoard()
                 glVertex2i(px, py + BLOCK_SIZE);
                 glEnd();
             }
-           else
-{
-    if (board[row][col] == 1) // I
-    {
-        drawBlock(col, row, 0.0f, 1.0f, 1.0f);
-    }
-    else if (board[row][col] == 2) // O
-    {
-        drawBlock(col, row, 1.0f, 1.0f, 0.0f);
-    }
-    else if (board[row][col] == 3) // T
-    {
-        drawBlock(col, row, 1.0f, 0.0f, 0.0f);
-    }
-    else if (board[row][col] == 4) // L
-    {
-        drawBlock(col, row, 0.2f, 0.6f, 0.1f);
-    }
-}
+            else
+            {
+                if (board[row][col] == 1) // I
+                {
+                    drawBlock(col, row, 0.0f, 1.0f, 1.0f);
+                }
+                else if (board[row][col] == 2) // O
+                {
+                    drawBlock(col, row, 1.0f, 1.0f, 0.0f);
+                }
+                else if (board[row][col] == 3) // T
+                {
+                    drawBlock(col, row, 1.0f, 0.0f, 0.0f);
+                }
+                else if (board[row][col] == 4) // L
+                {
+                    drawBlock(col, row, 0.2f, 0.6f, 0.1f);
+                }
+            }
         }
     }
 }

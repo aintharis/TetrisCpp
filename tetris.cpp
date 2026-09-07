@@ -26,6 +26,7 @@ void game(){
      if (!canMoveDown())
     {
         lockPiece();
+        clearLine();
         newPiece();
     }
 }
