@@ -5,8 +5,7 @@
 #include <GL/glut.h>
 #include <cstdlib>
 #include <ctime>
-#include <iostream>
-using namespace std;
+#include <cstdio>
 
 const int BOARD_WIDTH = 10;
 const int BOARD_HEIGHT = 20;
@@ -61,6 +60,7 @@ int currentShape = 0;
 int rotation = 0;
 int score = 0;
 bool GameOver = false;
+bool GameWon = false;
 bool canSpawnPiece();
 void newPiece()
 {
@@ -72,7 +72,6 @@ void newPiece()
     if (!canSpawnPiece())
     {
         GameOver = true;
-        cout << " GAME OVER! " << endl;
     }
 }
 void rotatePiece()
@@ -760,15 +759,6 @@ void clearLine()
 {
     for (int row = BOARD_HEIGHT - 1; row >= 0; row--)
     {
-        cout << "Row " << row << ": ";
-
-        for (int col = 0; col < BOARD_WIDTH; col++)
-        {
-            cout << board[row][col] << " ";
-        }
-
-        cout << endl;
-
         bool full = true;
 
         for (int col = 0; col < BOARD_WIDTH; col++)
@@ -782,8 +772,6 @@ void clearLine()
 
         if (full)
         {
-            cout << "FULL ROW FOUND: " << row << endl;
-
             for (int r = row; r > 0; r--)
             {
                 for (int col = 0; col < BOARD_WIDTH; col++)
@@ -800,6 +788,7 @@ void clearLine()
             score += 100;
         }
     }
+    
 }
 
 bool canSpawnPiece()
@@ -902,9 +891,11 @@ bool canSpawnPiece()
 
     return false;
 }
-
 void specialKeys(int key, int x, int y)
 {
+    if (GameOver || GameWon)
+        return;
+
     if (key == GLUT_KEY_UP)
     {
         if (canRotate())
@@ -912,6 +903,7 @@ void specialKeys(int key, int x, int y)
             rotatePiece();
         }
     }
+
     if (key == GLUT_KEY_RIGHT)
     {
         if (canMoveRight())
@@ -930,23 +922,33 @@ void specialKeys(int key, int x, int y)
 
     if (key == GLUT_KEY_DOWN)
     {
-        if (GameOver)
-        {
-            return;
-        }
         if (canMoveDown())
         {
             pieceRow++;
         }
         else
         {
+
+            
             lockPiece();
             clearLine();
+
             newPiece();
         }
     }
 
     glutPostRedisplay();
+}
+void drawText(float x, float y, const char* text)
+{
+    glColor3f(1.0f, 1.0f, 1.0f);
+
+    glRasterPos2f(x, y);
+
+    for (int i = 0; text[i] != '\0'; i++)
+    {
+        glutBitmapCharacter(GLUT_BITMAP_HELVETICA_18, text[i]);
+    }
 }
 
 void drawBoard()
@@ -970,6 +972,10 @@ void drawBoard()
     {
         // L
         drawLShape();
+    }
+    if (score >= 1000)
+    {
+        GameWon = true;
     }
 
     for (int row = 0; row < BOARD_HEIGHT; row++)
@@ -1009,7 +1015,31 @@ void drawBoard()
                 }
             }
         }
+        
     }
+     // SCORE
+    char scoreText[50];
+    sprintf(scoreText, "Score: %d", score);
+
+    drawText(10, WINDOW_HEIGHT - 25, scoreText);
+
+    // WIN / GAME OVER
+    if (GameWon)
+    {
+        glClear(GL_COLOR_BUFFER_BIT);
+        drawText(WINDOW_WIDTH / 2 - 55,
+                 WINDOW_HEIGHT / 2,
+                 "YOU WIN!");
+    }
+    if (GameOver)
+    {
+        glClear(GL_COLOR_BUFFER_BIT);
+        drawText(WINDOW_WIDTH / 2 - 70,
+                 WINDOW_HEIGHT / 2,
+                 "GAME OVER");
+    }
+
+    
 }
 
 #endif // BOARD_H
